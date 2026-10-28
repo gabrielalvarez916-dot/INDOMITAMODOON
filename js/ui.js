@@ -95,6 +95,7 @@
 
   // Cabecera negra con el logo y "Salir". Devuelve el cliente de Supabase ya con sesión o redirige al login.
   function iniciarPagina(client) {
+    pintarNav();
     var salir = document.getElementById('logout');
     if (salir) salir.addEventListener('click', function () {
       client.auth.signOut().then(function () { window.location.replace('index.html'); });
@@ -107,14 +108,44 @@
     });
   }
 
-  // Si quien entró es admin, aparece "Panel admin" en la cabecera (las demás personas no ven nada).
+  // Menú central de la cabecera negra. Se dibuja antes de saber quién es, así no "aparece tarde".
+  var NAV = [
+    { href: 'cursos.html', texto: 'Cursos', paginas: ['cursos.html', 'curso.html'] },
+    { href: 'mis-cursos.html', texto: 'Mis cursos', paginas: ['mis-cursos.html'] },
+    { href: 'perfil.html', texto: 'Perfil', paginas: ['perfil.html'] },
+    { href: 'ser-docente.html', texto: 'Ser docente', paginas: ['ser-docente.html'], clase: 'pl-nav__docente' }
+  ];
+
+  function paginaActual() {
+    var p = window.location.pathname.split('/').pop();
+    return p || 'index.html';
+  }
+
+  function itemNav(it, actual) {
+    var props = { href: it.href, text: it.texto };
+    if (it.clase) props.class = it.clase;
+    if (it.paginas.indexOf(actual) >= 0) props['aria-current'] = 'page';
+    return h('a', props);
+  }
+
+  function pintarNav() {
+    var inner = document.querySelector('.pl-header__inner');
+    var salir = document.getElementById('logout');
+    if (!inner || !salir || document.querySelector('.pl-nav')) return;
+    if (/admin\.html$/.test(window.location.pathname)) return;
+    var actual = paginaActual();
+    inner.classList.add('con-nav');
+    inner.insertBefore(h('nav', { class: 'pl-nav', 'aria-label': 'Menú principal' }, NAV.map(function (it) { return itemNav(it, actual); })), salir);
+  }
+
+  // Si quien entró es admin, se suma "Panel admin" al menú (las demás personas no ven nada).
   function mostrarLinkAdmin(client, sesion) {
     if (/admin\.html$/.test(window.location.pathname)) return;
     client.from('roles_usuario').select('rol').eq('usuario_id', sesion.user.id).eq('rol', 'admin').maybeSingle()
       .then(function (r) {
-        var salir = document.getElementById('logout');
-        if (!r.data || !salir || document.getElementById('admin-link')) return;
-        salir.parentNode.insertBefore(h('a', { id: 'admin-link', class: 'pl-salir pl-salir--link', href: 'admin.html', text: 'Panel admin' }), salir);
+        var nav = document.querySelector('.pl-nav');
+        if (!r.data || !nav || document.getElementById('admin-link')) return;
+        nav.appendChild(h('a', { id: 'admin-link', href: 'admin.html', text: 'Panel admin' }));
       }, function () {});
   }
 
