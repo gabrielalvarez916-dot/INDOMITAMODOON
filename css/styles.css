@@ -14,18 +14,21 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ---------- Layout ---------- */
-.login{min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr}
+/* ---------- Layout (escritorio): formulario a la izquierda, marca a la derecha ---------- */
+.login{min-height:100vh;display:grid;grid-template-columns:1fr 1.1fr;overflow:hidden}
 
-/* ---------- Lado marca (negro) ---------- */
+/* ---------- Lado marca (negro + textura topográfica + onda) ---------- */
 .brand{
   position:relative;z-index:1;
-  background:var(--black);color:var(--cream);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:56px 48px;
-  border-radius:0 110px 110px 0;
+  margin-left:-13vw;
+  background:var(--black) url("topo.svg") center/cover no-repeat;
+  color:var(--cream);
+  clip-path:url(#wave-side);
+  display:flex;align-items:center;justify-content:center;
+  padding:56px 48px 56px calc(13vw + 48px);
   text-align:center;
 }
+.brand__content{display:flex;flex-direction:column;align-items:center}
 .brand__top{
   margin:0 0 20px;
   font-weight:500;font-size:clamp(.8rem,1.1vw,1rem);
@@ -67,11 +70,14 @@ body{
 /* ---------- Lado formulario (crema) ---------- */
 .panel{
   display:flex;align-items:center;justify-content:center;
-  margin-left:-110px;padding:48px 48px 48px 158px;
+  padding:56px 24px 56px 6vw;
 }
-.panel__inner{width:100%;max-width:380px}
-.panel h2{margin:0 0 12px;font-size:clamp(1.7rem,2.4vw,2.2rem);font-weight:800;letter-spacing:-.01em}
-.panel__sub{margin:0 0 36px;color:var(--ink-soft);font-size:1rem;line-height:1.55}
+.panel__inner{width:100%;max-width:400px}
+.eyebrow{margin:0 0 22px;font-size:.78rem;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:var(--ink-soft)}
+.eyebrow strong{font-weight:800;color:var(--black)}
+.welcome{margin:0;font-size:clamp(2.2rem,3.6vw,3.2rem);font-weight:800;line-height:1.08;letter-spacing:-.02em}
+.welcome__bar{display:block;width:64px;height:5px;margin:18px 0 22px;border-radius:99px;background:var(--lime)}
+.panel__sub{margin:0 0 34px;color:var(--ink-soft);font-size:1rem;line-height:1.6;max-width:340px}
 
 .btn-google{
   width:100%;min-height:58px;padding:14px 24px;
@@ -92,16 +98,18 @@ body{
 .error{margin:18px 0 0;color:#9B1C1C;font-size:.9rem;font-weight:500}
 .legal{margin:28px 0 0;color:var(--ink-soft);font-size:.78rem;line-height:1.5}
 
-/* ---------- Celular / pantallas angostas ---------- */
+/* ---------- Celular / pantallas angostas: onda horizontal, marca arriba ---------- */
 @media (max-width:860px){
   .login{grid-template-columns:1fr;grid-template-rows:auto 1fr}
   .brand{
-    border-radius:0 0 56px 56px;
-    padding:48px 24px 44px;
+    grid-row:1;margin-left:0;
+    clip-path:url(#wave-bottom);
+    padding:52px 24px 96px;
   }
+  .panel{grid-row:2;padding:12px 24px 48px;align-items:flex-start}
   .logo{font-size:clamp(2.3rem,12vw,3.6rem)}
   .brand__tag{margin-top:20px}
-  .panel{margin-left:0;padding:40px 24px 48px;align-items:flex-start}
+  .welcome{font-size:clamp(2rem,9vw,2.6rem)}
 }
 
 @media (prefers-reduced-motion:reduce){
