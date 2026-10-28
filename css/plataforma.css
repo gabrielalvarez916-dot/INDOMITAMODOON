@@ -1,0 +1,183 @@
+/* plataforma.css — feed de cursos y página de curso (Indómita Modo On) */
+:root{
+  --black:#111111; --cream:#F8F5EC; --lime:#C8F000; --ink-soft:#5A5A52; --off:#34342F;
+  --white:#fff; --line:#E4DFD0; --star:#E8A400;
+  --radius:18px; --max:1200px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body.pl{margin:0;background:var(--cream);color:var(--black);font-family:Montserrat,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5}
+a{color:inherit}
+img,video{display:block;max-width:100%}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--black);outline-offset:3px;border-radius:6px}
+.pl-header :focus-visible,.pl-hero :focus-visible{outline-color:var(--lime)}
+
+/* ---------- Header ---------- */
+.pl-header{position:sticky;top:0;z-index:20;background:var(--black);color:var(--cream)}
+.pl-header__inner{max-width:var(--max);margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.pl-salir{background:transparent;border:1.5px solid rgba(248,245,236,.4);color:var(--cream);border-radius:999px;padding:8px 18px;font:600 .85rem Montserrat,sans-serif;cursor:pointer;transition:background .15s,color .15s}
+.pl-salir:hover{background:var(--cream);color:var(--black)}
+
+/* Logo: MODO + interruptor + N */
+.pl-logo{margin:0;display:inline-flex;align-items:center;font-weight:800;line-height:1;letter-spacing:-.02em;white-space:nowrap;text-decoration:none;color:var(--cream)}
+.pl-logo--header{font-size:1.5rem}
+.pl-switch{position:relative;display:inline-block;width:1.9em;height:.92em;margin:0 .06em;border-radius:999px;background:var(--lime);box-shadow:0 0 .55em rgba(200,240,0,.55),0 0 1.4em rgba(200,240,0,.3)}
+.pl-switch__knob{position:absolute;top:50%;left:.09em;width:.74em;height:.74em;margin-top:-.37em;border-radius:50%;background:#fff;transform:translateX(.98em)}
+
+/* ---------- Banner publicitario: ancho completo, proporción 4:1 (igual que Love Club) ---------- */
+.pl-banner{background:var(--white);border-bottom:1px solid var(--line)}
+.pl-banner__marco{position:relative;width:100%;aspect-ratio:4/1;overflow:hidden;background:var(--black)}
+.pl-slide{position:absolute;inset:0;display:block;opacity:0;transition:opacity .6s ease;pointer-events:none}
+.pl-slide.is-active{opacity:1;pointer-events:auto;z-index:1}
+.pl-slide img,.pl-slide video{width:100%;height:100%;object-fit:cover}
+a.pl-slide{cursor:pointer}
+.pl-banner__puntos{display:flex;justify-content:center;gap:6px;padding:8px 0}
+.pl-punto{width:6px;height:6px;padding:0;border:0;border-radius:3px;background:var(--line);cursor:pointer;transition:width .2s,background .2s}
+.pl-punto.is-active{width:18px;background:var(--black)}
+.pl-banner__propio{width:100%;aspect-ratio:4/1;background:var(--black) url("topo.svg") center/cover no-repeat;color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5em;container-type:inline-size}
+.pl-banner__propio .pl-logo{font-size:clamp(1.4rem,6cqw,3.4rem)}
+.pl-banner__lema{margin:0;font-weight:500;font-size:clamp(.5rem,1.6cqw,.9rem);letter-spacing:.3em;text-transform:uppercase;opacity:.85}
+
+/* ---------- Contenedor / buscador / filtros ---------- */
+.pl-contenedor{max-width:var(--max);margin:0 auto;padding:24px 20px 64px}
+.pl-toolbar{display:flex;flex-direction:column;gap:14px}
+.pl-buscador{display:flex;align-items:center;gap:10px;height:52px;padding:0 18px;background:var(--white);border:1px solid var(--line);border-radius:999px;color:var(--ink-soft);max-width:560px;width:100%}
+.pl-buscador:focus-within{border-color:var(--black);box-shadow:0 0 0 3px rgba(17,17,17,.08)}
+.pl-buscador input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:500 .95rem Montserrat,sans-serif;color:var(--black)}
+.pl-buscador input::-webkit-search-cancel-button{display:none}
+.pl-buscador button{border:0;background:transparent;cursor:pointer;color:var(--ink-soft);font-size:1rem;padding:4px}
+.pl-chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.pl-chip{flex:none;padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:var(--white);font:600 .8rem Montserrat,sans-serif;color:var(--black);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.pl-chip:hover{border-color:var(--black)}
+.pl-chip.is-active{background:var(--black);border-color:var(--black);color:var(--lime)}
+.pl-contador{margin:22px 0 14px;font-size:.82rem;font-weight:600;color:var(--ink-soft);min-height:1.2em}
+
+/* ---------- Grilla y tarjetas (estilo Udemy) ---------- */
+.pl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:22px}
+.pl-card{display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.05);transition:transform .18s ease,box-shadow .18s ease}
+.pl-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.pl-card__top{position:relative}
+.pl-portada{width:100%;aspect-ratio:16/9;background:var(--black);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.pl-portada img{width:100%;height:100%;object-fit:cover}
+.pl-portada__vacia{color:var(--lime);font-size:2.2rem}
+.pl-card__cuerpo{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pl-card__titulo{margin:0;font-size:1.1rem;font-weight:800;line-height:1.25;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pl-card__sinopsis{margin:0;font-size:.88rem;line-height:1.5;color:var(--ink-soft);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.pl-card__docente{margin:2px 0 0;font-size:.8rem;color:var(--ink-soft)}
+.pl-card__docente strong{color:var(--black);font-weight:600}
+.pl-card__precio{margin-top:auto;padding-top:10px}
+.pl-card--compacta .pl-card__titulo{font-size:.98rem}
+.pl-grid--compacto{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+
+.pl-nota{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:.85rem}
+.pl-nota strong{color:#8A5A00;font-weight:800}
+.pl-meta{margin:0;font-size:.78rem;color:var(--ink-soft)}
+.pl-precio{font-size:1.25rem;font-weight:800;letter-spacing:-.01em}
+.pl-pill{display:inline-block;border-radius:999px;font-weight:800;letter-spacing:.08em;font-size:.65rem;padding:5px 11px}
+.pl-pill--cat{position:absolute;left:12px;top:12px;background:var(--black);color:var(--cream);font-weight:600}
+.pl-pill--nuevo{background:var(--lime);color:var(--black);padding:3px 9px}
+.pl-pill--gratis{background:var(--lime);color:var(--black);font-size:.8rem;padding:6px 14px}
+
+/* Estrellas con relleno parcial */
+.pl-stars{position:relative;display:inline-block;font-size:.95rem;letter-spacing:1px;line-height:1;color:#D8D2BF;white-space:nowrap}
+.pl-stars::before{content:"★★★★★"}
+.pl-stars::after{content:"★★★★★";position:absolute;left:0;top:0;width:var(--pct,0%);overflow:hidden;color:var(--star)}
+
+/* ---------- Estados vacíos ---------- */
+.pl-vacio{text-align:center;padding:56px 20px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.pl-vacio h2{margin:6px 0 0;font-size:1.2rem;font-weight:800}
+.pl-vacio p{margin:0;color:var(--ink-soft);max-width:420px}
+.pl-vacio__icono{font-size:2.2rem}
+.pl-vacio--pagina{min-height:60vh;justify-content:center}
+.pl-cargando{text-align:center;padding:64px 20px;color:var(--ink-soft)}
+
+/* ---------- Botones ---------- */
+.pl-btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:14px 28px;font:600 .95rem Montserrat,sans-serif;text-decoration:none;cursor:pointer;margin-top:14px;transition:transform .15s,box-shadow .15s,opacity .15s}
+.pl-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(17,17,17,.16)}
+.pl-btn--negro{background:var(--black);color:var(--cream)}
+.pl-btn--lima{background:var(--lime);color:var(--black)}
+.pl-btn--ancho{width:100%;padding:16px 24px;margin-top:0}
+
+/* ---------- Página de curso ---------- */
+.pl-hero{background:var(--black) url("topo.svg") center/cover no-repeat;color:var(--cream)}
+.pl-hero__inner{max-width:var(--max);margin:0 auto;padding:28px 20px 36px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.pl-volver{font-size:.82rem;font-weight:600;text-decoration:none;opacity:.8}
+.pl-volver:hover{opacity:1;text-decoration:underline}
+.pl-pill--lima{position:static;background:var(--lime);color:var(--black)}
+.pl-hero__titulo{margin:4px 0 0;font-size:clamp(1.7rem,4.2vw,2.8rem);font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.pl-hero__sinopsis{margin:0;font-size:1.02rem;line-height:1.65;opacity:.9;max-width:62ch}
+.pl-nota--hero{font-size:.9rem}
+.pl-nota--hero strong{color:var(--star)}
+.pl-hero__meta{margin:0;font-size:.85rem;opacity:.85}
+.pl-hero__meta strong{font-weight:600}
+
+.pl-curso{max-width:var(--max);margin:0 auto;padding:0 20px 24px;display:flex;flex-direction:column;gap:8px}
+.pl-compra{order:-1;margin-top:20px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.10)}
+.pl-compra__cuerpo{padding:20px}
+.pl-compra__precio{margin:0 0 14px;font-size:1.9rem;font-weight:800;letter-spacing:-.02em}
+.pl-compra__titulo{margin:24px 0 12px;font-size:1rem;font-weight:800}
+.pl-incluye{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:.88rem;font-weight:500}
+.pl-incluye li{display:flex;gap:12px;align-items:flex-start}
+.pl-incluye__icono{width:22px;text-align:center;flex:none}
+
+.pl-seccion{margin-top:34px}
+.pl-seccion h2{margin:0 0 14px;font-size:1.35rem;font-weight:800;letter-spacing:-.01em}
+.pl-caja{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:20px}
+.pl-caja--sinpad{padding:0;overflow:hidden}
+.pl-checks{list-style:none;margin:0;display:grid;grid-template-columns:1fr;gap:12px}
+.pl-checks li{display:flex;gap:12px;font-size:.92rem;font-weight:500;line-height:1.5}
+.pl-check{flex:none;font-weight:800}
+.pl-lista{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:.92rem;font-weight:500}
+.pl-texto{margin:0;font-size:.92rem;line-height:1.75;color:var(--ink-soft)}
+.pl-texto--pre{white-space:pre-line}
+.pl-meta--resumen{margin-bottom:10px}
+
+.pl-modulo + .pl-modulo{border-top:1px solid var(--line)}
+.pl-modulo summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 18px;background:#FBFAF4;cursor:pointer}
+.pl-modulo summary::-webkit-details-marker{display:none}
+.pl-modulo summary::before{content:"▸";flex:none;transition:transform .15s}
+.pl-modulo[open] summary::before{transform:rotate(90deg)}
+.pl-modulo__titulo{flex:1;font-weight:600;font-size:.95rem}
+.pl-clases{list-style:none;margin:0;padding:0}
+.pl-clases li{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line);font-size:.88rem}
+.pl-clase__icono{flex:none;width:20px;text-align:center;color:var(--ink-soft)}
+.pl-clase__titulo{flex:1;font-weight:500}
+.pl-vista{display:block;font-style:normal;font-weight:600;font-size:.72rem;color:#4A6B00;margin-top:2px}
+
+.pl-docente{display:flex;gap:16px;align-items:flex-start}
+.pl-docente h3{margin:0 0 4px;font-size:1.05rem;font-weight:800}
+.pl-avatar{flex:none;width:68px;height:68px;border-radius:50%;object-fit:cover;background:var(--black)}
+.pl-avatar--inicial{display:flex;align-items:center;justify-content:center;background:var(--lime);font-weight:800;font-size:1.6rem}
+
+.pl-resumen-nota{display:flex;align-items:center;gap:16px;margin-bottom:16px}
+.pl-nota-grande{font-size:2.8rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.pl-resena{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.pl-resena__cab{display:flex;justify-content:space-between;gap:12px;font-size:.9rem}
+
+.pl-relacionados{max-width:var(--max);margin:12px auto 0;padding:24px 20px 72px}
+.pl-relacionados h2{margin:0 0 16px;font-size:1.35rem;font-weight:800}
+
+/* Escritorio: columna principal + tarjeta de compra pegajosa a la derecha */
+@media (min-width:960px){
+  .pl-hero{min-height:340px}
+  .pl-hero__inner{padding:44px 20px 56px;padding-right:calc(20px + 380px + 40px)}
+  .pl-curso{display:grid;grid-template-columns:minmax(0,1fr) 380px;column-gap:40px;align-items:start}
+  .pl-compra{order:2;margin-top:-210px;position:sticky;top:84px;z-index:2}
+  .pl-curso__main{order:1}
+  .pl-checks{grid-template-columns:1fr 1fr;column-gap:24px}
+}
+
+@media (max-width:600px){
+  .pl-grid{grid-template-columns:1fr}
+  .pl-banner__puntos{padding:6px 0}
+}
+
+/* ---------- Aviso (toast) ---------- */
+.pl-toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--black);color:var(--cream);padding:14px 22px;border-radius:999px;font-size:.88rem;font-weight:500;max-width:calc(100vw - 32px);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.pl-toast.is-visible{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .pl-slide,.pl-card,.pl-btn,.pl-chip,.pl-punto,.pl-toast,.pl-modulo summary::before{transition:none}
+}
