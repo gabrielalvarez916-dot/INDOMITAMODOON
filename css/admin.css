@@ -1,0 +1,106 @@
+/* admin.css — panel de administración (Indómita Modo On). Se apoya en las variables de plataforma.css */
+
+.ad-marca{display:flex;align-items:center;gap:12px}
+.ad-tag{font:700 .68rem Montserrat,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--black);background:var(--lime);padding:4px 10px;border-radius:999px}
+.ad-verificando{text-align:center;padding:60px 20px;color:var(--ink-soft);font-weight:600}
+.ad-contenedor{max-width:980px}
+
+/* ---------- Pestañas ---------- */
+.ad-tabs{display:flex;gap:6px;overflow-x:auto;padding:4px;background:var(--white);border:1px solid var(--line);border-radius:999px;width:max-content;max-width:100%;margin-bottom:22px}
+.ad-tab{flex:none;display:flex;align-items:center;gap:8px;border:0;background:transparent;padding:10px 20px;border-radius:999px;font:700 .85rem Montserrat,sans-serif;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s}
+.ad-tab:hover{color:var(--black)}
+.ad-tab.is-active{background:var(--black);color:var(--cream)}
+.ad-badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--lime);color:var(--black);font:800 .7rem/20px Montserrat,sans-serif;text-align:center}
+
+/* ---------- Filtros ---------- */
+.ad-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.ad-chip{display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--white);font:600 .8rem Montserrat,sans-serif;color:var(--black);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.ad-chip:hover{border-color:var(--black)}
+.ad-chip.is-active{background:var(--black);border-color:var(--black);color:var(--lime)}
+.ad-chip small{font-weight:700;opacity:.65}
+
+/* ---------- Tarjetas ---------- */
+.ad-lista{display:flex;flex-direction:column;gap:14px}
+.ad-card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+.ad-card.is-off{opacity:.62}
+.ad-fila{display:flex;gap:16px;align-items:flex-start}
+.ad-fila--centro{align-items:center}
+.ad-grow{flex:1;min-width:0}
+.ad-avatar{flex:none;width:56px;height:56px;border-radius:50%;background:var(--black);color:var(--lime);display:flex;align-items:center;justify-content:center;font:800 1.2rem Montserrat,sans-serif;overflow:hidden}
+.ad-avatar img{width:100%;height:100%;object-fit:cover}
+.ad-portada{flex:none;width:150px;aspect-ratio:16/9;border-radius:12px;background:var(--black) url("topo.svg") center/cover;overflow:hidden}
+.ad-portada img{width:100%;height:100%;object-fit:cover}
+.ad-titulo{margin:0;font:800 1.05rem/1.3 Montserrat,sans-serif}
+.ad-sub{margin:2px 0 0;font-size:.82rem;color:var(--ink-soft);font-weight:500}
+.ad-texto{margin:10px 0 0;font-size:.9rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.ad-acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.ad-pill{display:inline-block;padding:3px 11px;border-radius:999px;font:700 .68rem Montserrat,sans-serif;letter-spacing:.06em;text-transform:uppercase;background:var(--line);color:var(--off);vertical-align:middle;margin-left:8px}
+.ad-pill--ok{background:var(--lime);color:var(--black)}
+.ad-pill--warn{background:#FFE9A8;color:#6b4a00}
+.ad-pill--mal{background:#F8D7D2;color:#8a1f12}
+.ad-nota{margin:12px 0 0;padding:10px 14px;border-radius:12px;background:#FFF6D6;border:1px solid #F0DD9A;font-size:.85rem}
+.ad-vacio{padding:44px 20px;text-align:center;color:var(--ink-soft);font-weight:600;background:var(--white);border:1px dashed var(--line);border-radius:var(--radius)}
+.ad-cargando{padding:40px 0;text-align:center;color:var(--ink-soft);font-weight:600}
+.ad-error{padding:18px 20px;border-radius:var(--radius);background:#F8D7D2;color:#8a1f12;font-weight:600}
+
+/* ---------- Botones ---------- */
+.ad-btn{border:1.5px solid var(--black);background:var(--white);color:var(--black);border-radius:999px;padding:9px 18px;font:700 .82rem Montserrat,sans-serif;cursor:pointer;transition:background .15s,color .15s,transform .1s}
+.ad-btn:hover:not(:disabled){background:var(--black);color:var(--cream)}
+.ad-btn:active:not(:disabled){transform:scale(.97)}
+.ad-btn:disabled{opacity:.45;cursor:not-allowed}
+.ad-btn--ok{background:var(--lime);border-color:var(--lime)}
+.ad-btn--ok:hover:not(:disabled){background:var(--black);border-color:var(--black);color:var(--lime)}
+.ad-btn--mal{border-color:#B3261E;color:#B3261E}
+.ad-btn--mal:hover:not(:disabled){background:#B3261E;color:#fff}
+.ad-btn--chico{padding:6px 12px;font-size:.76rem}
+.ad-btn--suave{border-color:var(--line)}
+.ad-flecha{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1rem}
+
+/* ---------- Detalles del curso ---------- */
+.ad-detalle{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.ad-detalle summary{cursor:pointer;font:700 .82rem Montserrat,sans-serif}
+.ad-detalle h4{margin:16px 0 6px;font:800 .72rem Montserrat,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.ad-detalle ul{margin:0;padding-left:20px;font-size:.88rem}
+.ad-detalle .ad-modulo{margin:0 0 10px;font-weight:700;font-size:.88rem}
+.ad-detalle .ad-clases{margin:0 0 12px;color:var(--off)}
+
+/* ---------- Formularios ---------- */
+.ad-form{display:flex;flex-direction:column;gap:14px;margin-bottom:22px;border:2px solid var(--black)}
+.ad-form h3{margin:0;font:800 1.05rem Montserrat,sans-serif}
+.ad-campo{display:flex;flex-direction:column;gap:6px}
+.ad-campo>label,.ad-campo>span.ad-label{font:700 .78rem Montserrat,sans-serif;letter-spacing:.04em}
+.ad-campo small{color:var(--ink-soft);font-size:.78rem;font-weight:500}
+.ad-input,.ad-select,.ad-textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;background:var(--white);padding:11px 14px;font:500 .92rem Montserrat,sans-serif;color:var(--black)}
+.ad-textarea{min-height:90px;resize:vertical}
+.ad-input:focus,.ad-select:focus,.ad-textarea:focus{outline:0;border-color:var(--black);box-shadow:0 0 0 3px rgba(17,17,17,.08)}
+.ad-opciones{display:flex;gap:18px;flex-wrap:wrap}
+.ad-opciones label{display:flex;align-items:center;gap:7px;font-weight:600;font-size:.88rem;cursor:pointer}
+.ad-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ad-aviso{margin:0;font-size:.8rem;font-weight:600;color:#6b4a00;background:#FFF6D6;border-radius:10px;padding:8px 12px}
+
+/* ---------- Banners ---------- */
+.ad-banner-prev{flex:none;width:300px;aspect-ratio:4/1;border-radius:10px;overflow:hidden;background:var(--black)}
+.ad-banner-prev img,.ad-banner-prev video{width:100%;height:100%;object-fit:cover}
+.ad-prevbox{width:100%;max-width:520px;aspect-ratio:4/1;border-radius:10px;overflow:hidden;background:var(--black);display:none}
+.ad-prevbox.is-on{display:block}
+.ad-prevbox img,.ad-prevbox video{width:100%;height:100%;object-fit:cover}
+
+/* ---------- Interruptor ---------- */
+.ad-switch{position:relative;display:inline-flex;align-items:center;gap:10px;cursor:pointer;font:700 .8rem Montserrat,sans-serif;user-select:none}
+.ad-switch input{position:absolute;opacity:0;width:0;height:0}
+.ad-switch__riel{position:relative;width:44px;height:24px;border-radius:999px;background:#cfcabb;transition:background .2s}
+.ad-switch__riel::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.ad-switch input:checked+.ad-switch__riel{background:var(--black)}
+.ad-switch input:checked+.ad-switch__riel::after{transform:translateX(20px);background:var(--lime)}
+.ad-switch input:focus-visible+.ad-switch__riel{outline:3px solid var(--black);outline-offset:2px}
+
+.ad-ayuda{margin:0 0 16px;font-size:.85rem;color:var(--ink-soft);font-weight:500}
+
+@media (max-width:720px){
+  .ad-fila{flex-wrap:wrap}
+  .ad-portada{width:100%}
+  .ad-banner-prev{width:100%}
+  .ad-grid2{grid-template-columns:1fr}
+  .ad-tab{padding:9px 14px}
+  .ad-card{padding:16px}
+}

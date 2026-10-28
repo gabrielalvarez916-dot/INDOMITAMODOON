@@ -18,6 +18,7 @@ img,video{display:block;max-width:100%}
 .pl-header__inner{max-width:var(--max);margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .pl-salir{background:transparent;border:1.5px solid rgba(248,245,236,.4);color:var(--cream);border-radius:999px;padding:8px 18px;font:600 .85rem Montserrat,sans-serif;cursor:pointer;transition:background .15s,color .15s}
 .pl-salir:hover{background:var(--cream);color:var(--black)}
+.pl-salir--link{text-decoration:none;display:inline-block;margin-left:auto;margin-right:10px}
 
 /* Logo: MODO + interruptor + N */
 .pl-logo{margin:0;display:inline-flex;align-items:center;font-weight:800;line-height:1;letter-spacing:-.02em;white-space:nowrap;text-decoration:none;color:var(--cream)}

@@ -102,8 +102,20 @@
     return client.auth.getSession().then(function (r) {
       var s = r.data && r.data.session;
       if (!s) { window.location.replace('index.html'); return null; }
+      mostrarLinkAdmin(client, s);
       return s;
     });
+  }
+
+  // Si quien entró es admin, aparece "Panel admin" en la cabecera (las demás personas no ven nada).
+  function mostrarLinkAdmin(client, sesion) {
+    if (/admin\.html$/.test(window.location.pathname)) return;
+    client.from('roles_usuario').select('rol').eq('usuario_id', sesion.user.id).eq('rol', 'admin').maybeSingle()
+      .then(function (r) {
+        var salir = document.getElementById('logout');
+        if (!r.data || !salir || document.getElementById('admin-link')) return;
+        salir.parentNode.insertBefore(h('a', { id: 'admin-link', class: 'pl-salir pl-salir--link', href: 'admin.html', text: 'Panel admin' }), salir);
+      }, function () {});
   }
 
   window.ModoOnUI = {
