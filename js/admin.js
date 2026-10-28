@@ -111,7 +111,7 @@
   function vistaDocentes() {
     cargando();
     client.from('docentes')
-      .select('usuario_id, nombre_publico, bio_publica, avatar_url, estado, creado_en, resuelto_en, perfiles(nombre)')
+      .select('usuario_id, nombre_publico, bio_publica, avatar_url, estado, creado_en, resuelto_en, perfiles!docentes_usuario_id_fkey(nombre)')
       .order('creado_en', { ascending: false })
       .then(check).then(function (lista) {
         var cuenta = {};
@@ -169,7 +169,7 @@
   function vistaCursos() {
     cargando();
     client.from('cursos')
-      .select('id, titulo, subtitulo, descripcion, aprenderas, requisitos, estado, nota_revision, precio_usd, es_gratis, portada_url, actualizado_en, publicado_en, categorias(nombre), docentes(nombre_publico), modulos(id, titulo, orden, clases(id, titulo, tipo, duracion_seg, orden))')
+      .select('id, titulo, subtitulo, descripcion, aprenderas, requisitos, estado, nota_revision, precio_usd, es_gratis, portada_url, actualizado_en, publicado_en, categorias(nombre), docentes!cursos_docente_id_fkey(nombre_publico), modulos(id, titulo, orden, clases(id, titulo, tipo, duracion_seg, orden))')
       .order('actualizado_en', { ascending: false })
       .then(check).then(function (lista) {
         var cuenta = {};
