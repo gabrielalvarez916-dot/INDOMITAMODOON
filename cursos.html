@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indómita Modo On · Mis cursos</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .home{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
+  .home h1{margin:0;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800}
+  .home p{margin:0;color:var(--ink-soft)}
+  .btn-out{margin-top:12px;padding:14px 28px;border:2px solid var(--black);border-radius:999px;background:transparent;font:600 1rem Montserrat,sans-serif;cursor:pointer;color:var(--black)}
+  .btn-out:hover{background:var(--black);color:var(--cream)}
+  .btn-out:focus-visible{outline:3px solid var(--black);outline-offset:3px}
+</style>
+</head>
+<body>
+<main class="home">
+  <h1>Estás adentro</h1>
+  <p id="who">Cargando…</p>
+  <button class="btn-out" id="logout" type="button">Salir</button>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script>
+  var client = window.supabase.createClient(window.MODO_ON_CONFIG.url, window.MODO_ON_CONFIG.key);
+  client.auth.getSession().then(function (r) {
+    var s = r.data && r.data.session;
+    if (!s) { window.location.replace('index.html'); return; }
+    document.getElementById('who').textContent = s.user.email;
+  });
+  document.getElementById('logout').addEventListener('click', function () {
+    client.auth.signOut().then(function () { window.location.replace('index.html'); });
+  });
+</script>
+</body>
+</html>

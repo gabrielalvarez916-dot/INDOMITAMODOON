@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Indómita Modo On · Ingresar</title>
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<main class="login">
+
+  <section class="brand" aria-label="Indómita Modo On">
+    <p class="brand__top">INDÓMITA</p>
+    <h1 class="logo" aria-label="Modo On">
+      <span aria-hidden="true">MODO</span>
+      <span class="switch" id="switch" aria-hidden="true"><span class="switch__knob"></span></span>
+      <span aria-hidden="true">N</span>
+    </h1>
+    <p class="brand__tag">More skills. More possibilities.</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel__inner">
+      <h2>Entrá a tu cuenta</h2>
+      <p class="panel__sub">Ingresá con tu cuenta de Google para empezar a aprender.</p>
+
+      <button class="btn-google" id="btn-google" type="button">
+        <span class="btn-google__icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.2 5.5-4.7 7.2l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+        </span>
+        <span>Continuar con Google</span>
+      </button>
+
+      <p class="error" id="error" role="alert" hidden></p>
+      <p class="legal">Al continuar aceptás los términos y la política de privacidad de Indómita.</p>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
