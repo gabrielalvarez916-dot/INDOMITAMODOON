@@ -106,7 +106,10 @@ body{
     clip-path:url(#wave-bottom);
     padding:52px 24px 96px;
   }
-  .panel{grid-row:2;padding:12px 24px 48px;align-items:flex-start}
+  .panel{grid-row:2;padding:40px 24px 48px;align-items:flex-start}
+  .panel__inner{text-align:center}
+  .welcome__bar{margin-left:auto;margin-right:auto}
+  .panel__sub{margin-left:auto;margin-right:auto}
   .logo{font-size:clamp(2.3rem,12vw,3.6rem)}
   .brand__tag{margin-top:20px}
   .welcome{font-size:clamp(2rem,9vw,2.6rem)}
