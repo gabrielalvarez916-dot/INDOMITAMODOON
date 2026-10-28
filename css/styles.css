@@ -101,13 +101,14 @@ body{
 
 /* ---------- Celular / pantallas angostas: onda horizontal, marca arriba ---------- */
 @media (max-width:860px){
-  .login{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  /* La parte negra se estira y ocupa todo el alto sobrante; el panel crema mide solo lo que necesita */
+  .login{grid-template-columns:1fr;grid-template-rows:1fr auto;min-height:100vh;min-height:100dvh}
   .brand{
     grid-row:1;margin-left:0;
     clip-path:url(#wave-bottom);
     padding:52px 24px 96px;
   }
-  .panel{grid-row:2;padding:40px 24px 48px;align-items:flex-start}
+  .panel{grid-row:2;padding:28px 24px calc(36px + env(safe-area-inset-bottom,0px));align-items:flex-start}
   .panel__inner{text-align:center}
   .welcome__bar{margin-left:auto;margin-right:auto}
   .panel__sub{margin-left:auto;margin-right:auto}
