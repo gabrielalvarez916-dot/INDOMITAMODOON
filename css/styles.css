@@ -52,20 +52,21 @@ body{
   position:relative;display:inline-block;
   width:1.9em;height:.92em;margin:0 .06em;
   border-radius:999px;
-  background:var(--off);
-  transition:background .45s ease, box-shadow .45s ease;
+  background:var(--lime);
+  box-shadow:0 0 .55em rgba(200,240,0,.55), 0 0 1.4em rgba(200,240,0,.3);
+  transition:box-shadow .45s ease;
 }
 .switch__knob{
   position:absolute;top:50%;left:.09em;
   width:.74em;height:.74em;margin-top:-.37em;
   border-radius:50%;background:#fff;
+  transform:translateX(.98em);
   transition:transform .5s cubic-bezier(.5,1.6,.4,1);
 }
+/* Al tocar el botón, el interruptor brilla más fuerte */
 .switch.is-on{
-  background:var(--lime);
-  box-shadow:0 0 .55em rgba(200,240,0,.55), 0 0 1.4em rgba(200,240,0,.3);
+  box-shadow:0 0 .7em rgba(200,240,0,.8), 0 0 1.9em rgba(200,240,0,.5);
 }
-.switch.is-on .switch__knob{transform:translateX(.98em)}
 
 /* ---------- Lado formulario (crema) ---------- */
 .panel{
