@@ -104,3 +104,10 @@
   .ad-tab{padding:9px 14px}
   .ad-card{padding:16px}
 }
+
+/* ---------- Cursos de un docente / archivos de las clases ---------- */
+.ad-cursos-doc{margin-top:12px}
+.ad-cursos-doc ul{margin:4px 0 0;padding-left:20px;font-size:.88rem}
+.ad-sincurso{margin-top:10px;font-weight:700;color:#8a1f12}
+.ad-clases li{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-bottom:6px}
+.ad-clases .ad-pill{margin-left:0}

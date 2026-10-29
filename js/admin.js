@@ -111,7 +111,7 @@
   function vistaDocentes() {
     cargando();
     client.from('docentes')
-      .select('usuario_id, nombre_publico, bio_publica, avatar_url, estado, creado_en, resuelto_en, perfiles!docentes_usuario_id_fkey(nombre)')
+      .select('usuario_id, nombre_publico, bio_publica, avatar_url, estado, creado_en, resuelto_en, perfiles!docentes_usuario_id_fkey(nombre), cursos!cursos_docente_id_fkey(id, titulo, estado)')
       .order('creado_en', { ascending: false })
       .then(check).then(function (lista) {
         var cuenta = {};
@@ -127,7 +127,23 @@
       }).catch(errorVista);
   }
 
+  var ESTADO_CURSO_TXT = { borrador: 'Borrador', en_revision: 'En revisión', publicado: 'Publicado', pausado: 'Pausado' };
+
+  // Cursos que cargó el docente: es lo que hay que mirar para decidir si se lo aprueba
+  function cursosDeDocente(d) {
+    var lista = d.cursos || [];
+    if (!lista.length) return h('p', { class: 'ad-sub ad-sincurso', text: 'Todavía no cargó ningún curso.' });
+    return h('div', { class: 'ad-cursos-doc' }, h('p', { class: 'ad-sub', text: 'Cursos cargados:' }),
+      h('ul', null, lista.map(function (c) {
+        return h('li', null, c.titulo + ' ', h('span', { class: 'ad-pill ' + (c.estado === 'en_revision' ? 'ad-pill--warn' : c.estado === 'publicado' ? 'ad-pill--ok' : ''), text: ESTADO_CURSO_TXT[c.estado] || c.estado }));
+      })),
+      d.estado === 'pendiente' ? h('p', { class: 'ad-sub', text: 'Revisalos en la pestaña Cursos. Al aprobar el curso también se aprueba al docente.' }) : null);
+  }
+
   function resolverDocente(d, estado, confirmar, ok) {
+    if (estado === 'aprobado' && d.estado === 'pendiente' && !(d.cursos || []).length) {
+      confirmar = confirmar || '¿Aprobar a ' + d.nombre_publico + '? Todavía no cargó ningún curso.';
+    }
     if (confirmar && !window.confirm(confirmar)) return;
     client.rpc('admin_resolver_docente', { _usuario: d.usuario_id, _estado: estado })
       .then(check).then(function () { U.toast(ok); contarPendientes(); vistaDocentes(); }).catch(fail);
@@ -157,7 +173,8 @@
         h('div', { class: 'ad-grow' },
           h('h3', { class: 'ad-titulo' }, d.nombre_publico, h('span', { class: 'ad-pill ' + pill[1], text: pill[0] })),
           h('p', { class: 'ad-sub', text: 'Solicitó el ' + U.fechaCorta(d.creado_en) + quien + (d.resuelto_en && d.estado !== 'pendiente' ? ' · resuelto el ' + U.fechaCorta(d.resuelto_en) : '') }),
-          d.bio_publica ? h('p', { class: 'ad-texto', text: d.bio_publica }) : h('p', { class: 'ad-sub', text: 'Sin biografía.' }),
+          d.bio_publica ? h('p', { class: 'ad-texto', text: d.bio_publica }) : null,
+          cursosDeDocente(d),
           h('div', { class: 'ad-acciones' }, acciones))));
   }
 
@@ -169,7 +186,7 @@
   function vistaCursos() {
     cargando();
     client.from('cursos')
-      .select('id, titulo, subtitulo, descripcion, aprenderas, requisitos, estado, nota_revision, precio_usd, es_gratis, portada_url, actualizado_en, publicado_en, categorias(nombre), docentes!cursos_docente_id_fkey(nombre_publico), modulos(id, titulo, orden, clases(id, titulo, tipo, duracion_seg, orden))')
+      .select('id, titulo, subtitulo, descripcion, aprenderas, requisitos, estado, nota_revision, precio_usd, es_gratis, portada_url, actualizado_en, publicado_en, categorias(nombre), docentes!cursos_docente_id_fkey(usuario_id, nombre_publico, estado), modulos(id, titulo, orden, clases(id, titulo, tipo, duracion_seg, orden, clases_contenido(video_path, archivo_path)))')
       .order('actualizado_en', { ascending: false })
       .then(check).then(function (lista) {
         var cuenta = {};
@@ -186,8 +203,25 @@
   }
 
   function resolverCurso(c, estado, nota, ok) {
+    var doc = uno(c.docentes);
+    // Si el docente todavía está pendiente, aprobar su curso es aprobarlo a él también
+    if (estado === 'publicado' && doc && doc.estado === 'pendiente') {
+      if (!window.confirm('Al publicar este curso también se aprueba a ' + doc.nombre_publico + ' como docente. ¿Seguir?')) return Promise.resolve();
+      return client.rpc('admin_resolver_docente', { _usuario: doc.usuario_id, _estado: 'aprobado' }).then(check).then(function () {
+        return client.rpc('admin_resolver_curso', { _curso: c.id, _estado: estado, _nota: nota || null }).then(check);
+      }).then(function () { U.toast(ok + ' y docente aprobado'); contarPendientes(); vistaCursos(); }).catch(fail);
+    }
     return client.rpc('admin_resolver_curso', { _curso: c.id, _estado: estado, _nota: nota || null })
       .then(check).then(function () { U.toast(ok); contarPendientes(); vistaCursos(); }).catch(fail);
+  }
+
+  // Abre un video o PDF privado de una clase (enlace temporal de 1 hora)
+  function abrirArchivo(path) {
+    var w = window.open('', '_blank');
+    client.storage.from('clases').createSignedUrl(path, 3600).then(function (r) {
+      if (r.error) throw r.error;
+      if (w) w.location.href = r.data.signedUrl; else window.location.href = r.data.signedUrl;
+    }).catch(function (e) { if (w) w.close(); fail(e); });
   }
 
   function tarjetaCurso(c) {
@@ -197,7 +231,7 @@
     var nClases = 0, seg = 0;
     modulos.forEach(function (m) { (m.clases || []).forEach(function (cl) { nClases++; seg += cl.duracion_seg || 0; }); });
     var resumen = [
-      doc ? 'Docente: ' + doc.nombre_publico : null,
+      doc ? 'Docente: ' + doc.nombre_publico + (doc.estado === 'pendiente' ? ' (solicitud pendiente)' : '') : null,
       cat ? cat.nombre : 'Sin categoría',
       c.es_gratis ? 'Gratis' : (c.precio_usd != null ? 'USD ' + c.precio_usd : 'Sin precio'),
       modulos.length + (modulos.length === 1 ? ' módulo' : ' módulos') + ' · ' + nClases + (nClases === 1 ? ' clase' : ' clases') + (seg ? ' · ' + U.duracionLarga(seg) : '')
@@ -214,7 +248,12 @@
         var clases = (m.clases || []).slice().sort(function (a, b) { return a.orden - b.orden; });
         return [h('p', { class: 'ad-modulo', text: (i + 1) + '. ' + m.titulo }),
           h('ul', { class: 'ad-clases' }, clases.map(function (cl) {
-            return h('li', { text: cl.titulo + ' — ' + (TIPO_CLASE[cl.tipo] || cl.tipo) + (cl.duracion_seg ? ' (' + U.duracionClase(cl.duracion_seg) + ')' : '') });
+            var ct = uno(cl.clases_contenido) || {};
+            return h('li', null,
+              cl.titulo + (cl.duracion_seg ? ' (' + U.duracionClase(cl.duracion_seg) + ')' : '') + ' ',
+              ct.video_path ? btn('▶ Ver video', 'ad-btn--chico ad-btn--suave', function () { abrirArchivo(ct.video_path); }) : h('span', { class: 'ad-pill ad-pill--mal', text: 'Sin video' }),
+              ' ',
+              ct.archivo_path ? btn('📄 Ver PDF', 'ad-btn--chico ad-btn--suave', function () { abrirArchivo(ct.archivo_path); }) : h('span', { class: 'ad-pill ad-pill--mal', text: 'Sin PDF' }));
           }))];
       }) : h('p', { class: 'ad-sub', text: 'Todavía no tiene módulos.' }));
 

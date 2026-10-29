@@ -113,7 +113,7 @@
     { href: 'cursos.html', texto: 'Cursos', paginas: ['cursos.html', 'curso.html'] },
     { href: 'mis-cursos.html', texto: 'Mis cursos', paginas: ['mis-cursos.html'] },
     { href: 'perfil.html', texto: 'Perfil', paginas: ['perfil.html'] },
-    { href: 'ser-docente.html', texto: 'Ser docente', paginas: ['ser-docente.html'], clase: 'pl-nav__docente' }
+    { href: 'ser-docente.html', texto: 'Ser docente', paginas: ['ser-docente.html', 'editar-curso.html'], clase: 'pl-nav__docente' }
   ];
 
   function paginaActual() {

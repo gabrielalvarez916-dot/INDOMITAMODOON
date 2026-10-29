@@ -223,3 +223,71 @@ a.pl-slide{cursor:pointer}
 .pl-estado__fila{display:flex;align-items:center;gap:12px;margin:0 0 10px}
 .pl-estado .pl-texto{color:var(--black)}
 .pl-pagina .pl-caja + .pl-caja{margin-top:18px}
+
+/* ---------- Editor de cursos y centro del docente ---------- */
+.ed-pagina{max-width:860px}
+.ed-volver{display:inline-block;margin-bottom:6px;font-size:.82rem;font-weight:600;text-decoration:none;color:var(--ink-soft)}
+.ed-volver:hover{color:var(--black);text-decoration:underline}
+.ed-devuelto{margin:0 0 18px;line-height:1.5}
+.ed-seccion{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.ed-seccion h2{margin:0;font-size:1.2rem;font-weight:800}
+.ed-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ed-grande{min-height:160px}
+.ed-chica{min-height:64px}
+.ed-fila{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ed-acciones{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ed-btn{border:1.5px solid var(--black);background:var(--white);color:var(--black);border-radius:999px;padding:9px 18px;font:700 .82rem Montserrat,sans-serif;cursor:pointer;transition:background .15s,color .15s;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+.ed-btn:hover:not(:disabled):not(.is-off){background:var(--black);color:var(--cream)}
+.ed-btn:disabled,.ed-btn.is-off{opacity:.45;cursor:not-allowed}
+.ed-btn--ok{background:var(--lime);border-color:var(--lime);color:var(--black)}
+.ed-btn--ok:hover:not(:disabled){background:var(--black);border-color:var(--black);color:var(--lime)}
+.ed-btn--mal{border-color:#B3261E;color:#B3261E}
+.ed-btn--mal:hover:not(:disabled){background:#B3261E;border-color:#B3261E;color:#fff}
+.ed-btn--suave{border-color:var(--line)}
+.ed-btn--chico{padding:6px 12px;font-size:.76rem}
+.ed-btn--grande{padding:14px 28px;font-size:.95rem}
+.ed-flecha{width:34px;height:34px;padding:0;font-size:1rem}
+.ed-subir{cursor:pointer}
+.ed-portada{width:100%;max-width:480px;aspect-ratio:16/9;border-radius:12px;border:1.5px dashed var(--line);background:var(--white);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ed-portada:not(.is-on)::before{content:"Sin portada";color:var(--ink-soft);font-weight:600;font-size:.85rem}
+.ed-portada.is-on{border-style:solid}
+.ed-portada img{width:100%;height:100%;object-fit:cover}
+.ed-temario{display:flex;flex-direction:column;gap:16px}
+.ed-modulo{border:1px solid var(--line);border-radius:16px;padding:16px;background:#FBFAF4;display:flex;flex-direction:column;gap:14px}
+.ed-modulo__cab{display:flex;align-items:center;gap:8px}
+.ed-modulo__input{flex:1;min-width:0;font-weight:700}
+.ed-modulo__titulo{margin:0;font-size:1rem;font-weight:800}
+.ed-num{flex:none;width:30px;height:30px;border-radius:50%;background:var(--black);color:var(--lime);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem}
+.ed-clases{display:flex;flex-direction:column;gap:12px}
+.ed-sinclases{margin:0;color:var(--ink-soft);font-size:.85rem}
+.ed-clase{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.ed-clase__cab{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ed-clase__n{font:800 .72rem Montserrat,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.ed-clase__acc{display:flex;gap:6px}
+.ed-slots{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ed-slot{border:1.5px dashed var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.ed-slot__titulo{margin:0;font:800 .8rem Montserrat,sans-serif}
+.ed-slot__estado{margin:0;font-size:.82rem;font-weight:600}
+.ed-slot__estado.is-ok,.ed-checklist li.is-ok{color:#37500A}
+.ed-slot__estado.is-falta,.ed-checklist li.is-falta{color:#8a1f12}
+.ed-slot small{color:var(--ink-soft);font-size:.74rem;font-weight:500}
+.ed-barra{height:8px;background:var(--line);border-radius:999px;overflow:hidden}
+.ed-barra span{display:block;height:100%;width:0;background:var(--black);transition:width .2s}
+.ed-check{display:flex;gap:8px;align-items:center;font-size:.85rem;font-weight:600;cursor:pointer}
+.ed-check--chico{font-size:.78rem}
+.ed-checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.9rem}
+.ed-lista{margin:0;padding-left:20px;font-size:.88rem}
+.ed-vacio{padding:24px 12px}
+.ed-cursos{display:flex;flex-direction:column;gap:12px}
+.ed-curso{display:flex;justify-content:space-between;align-items:center;gap:14px;border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:var(--white)}
+.ed-curso__info{min-width:0}
+.ed-curso__titulo{margin:0 0 2px;font-weight:800;font-size:1rem;overflow-wrap:anywhere}
+.ed-curso__nota{margin:8px 0 0;font-size:.84rem;font-weight:600;color:#8a1f12}
+.ed-pill{position:static;margin-left:10px;vertical-align:middle}
+.ed-datos{margin-top:20px;max-width:640px}
+.ed-datos summary{cursor:pointer;font:700 .9rem Montserrat,sans-serif}
+@media (max-width:640px){
+  .ed-grid2,.ed-slots{grid-template-columns:1fr}
+  .ed-curso{flex-direction:column;align-items:stretch}
+  .ed-modulo__cab{flex-wrap:wrap}
+}
