@@ -186,7 +186,7 @@
   function vistaCursos() {
     cargando();
     client.from('cursos')
-      .select('id, titulo, subtitulo, descripcion, aprenderas, requisitos, estado, nota_revision, precio_usd, es_gratis, portada_url, actualizado_en, publicado_en, categorias(nombre), docentes!cursos_docente_id_fkey(usuario_id, nombre_publico, estado), modulos(id, titulo, orden, clases(id, titulo, tipo, duracion_seg, orden, clases_contenido(video_path, archivo_path)))')
+      .select('id, titulo, subtitulo, descripcion, aprenderas, requisitos, estado, nota_revision, precio_usd, es_gratis, portada_url, actualizado_en, publicado_en, categorias(nombre), docentes!cursos_docente_id_fkey(usuario_id, nombre_publico, estado), modulos(id, titulo, orden, clases(id, titulo, tipo, duracion_seg, orden, clases_contenido(video_uid, archivo_path)))')
       .order('actualizado_en', { ascending: false })
       .then(check).then(function (lista) {
         var cuenta = {};
@@ -215,14 +215,8 @@
       .then(check).then(function () { U.toast(ok); contarPendientes(); vistaCursos(); }).catch(fail);
   }
 
-  // Abre un video o PDF privado de una clase (enlace temporal de 1 hora)
-  function abrirArchivo(path) {
-    var w = window.open('', '_blank');
-    client.storage.from('clases').createSignedUrl(path, 3600).then(function (r) {
-      if (r.error) throw r.error;
-      if (w) w.location.href = r.data.signedUrl; else window.location.href = r.data.signedUrl;
-    }).catch(function (e) { if (w) w.close(); fail(e); });
-  }
+  // Abre el video (Cloudflare Stream) o el PDF (R2) de una clase con un enlace temporal
+  function abrirArchivo(claseId, tipo) { window.ModoOnSubidas.verArchivo(claseId, tipo, fail); }
 
   function tarjetaCurso(c) {
     var pill = PILL_CUR[c.estado] || [c.estado, ''];
@@ -251,9 +245,9 @@
             var ct = uno(cl.clases_contenido) || {};
             return h('li', null,
               cl.titulo + (cl.duracion_seg ? ' (' + U.duracionClase(cl.duracion_seg) + ')' : '') + ' ',
-              ct.video_path ? btn('▶ Ver video', 'ad-btn--chico ad-btn--suave', function () { abrirArchivo(ct.video_path); }) : h('span', { class: 'ad-pill ad-pill--mal', text: 'Sin video' }),
+              ct.video_uid ? btn('▶ Ver video', 'ad-btn--chico ad-btn--suave', function () { abrirArchivo(cl.id, 'video'); }) : h('span', { class: 'ad-pill ad-pill--mal', text: 'Sin video' }),
               ' ',
-              ct.archivo_path ? btn('📄 Ver PDF', 'ad-btn--chico ad-btn--suave', function () { abrirArchivo(ct.archivo_path); }) : h('span', { class: 'ad-pill ad-pill--mal', text: 'Sin PDF' }));
+              ct.archivo_path ? btn('📄 Ver PDF', 'ad-btn--chico ad-btn--suave', function () { abrirArchivo(cl.id, 'pdf'); }) : h('span', { class: 'ad-pill ad-pill--mal', text: 'Sin PDF' }));
           }))];
       }) : h('p', { class: 'ad-sub', text: 'Todavía no tiene módulos.' }));
 

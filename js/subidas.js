@@ -1,6 +1,6 @@
-// subidas.js — subir archivos reales (video, PDF, imágenes) al almacenamiento de Supabase, con barra de progreso.
+// subidas.js — subir archivos reales (video, PDF, imágenes), con barra de progreso.
 // Nada de links: lo que carga el docente queda guardado en la plataforma.
-// Buckets: "portadas" (público, imágenes) y "clases" (privado: video + PDF; solo lo ve el docente, el admin y los alumnos con acceso).
+// Portadas (imágenes chicas) → Supabase Storage, bucket "portadas". Videos → Cloudflare Stream. PDF → Cloudflare R2.
 (function () {
   var cfg = window.MODO_ON_CONFIG, client = window.modoOnClient;
 
@@ -83,6 +83,70 @@
     });
   }
 
+
+  /* ---------- Cloudflare: videos en Stream, PDF en R2 (vía la función "archivos") ---------- */
+  function llamar(accion, datos) {
+    return client.functions.invoke('archivos', { body: Object.assign({ accion: accion }, datos) }).then(function (r) {
+      if (!r.error) return r.data;
+      var ctx = r.error.context;
+      var base = 'No se pudo comunicar con el servidor de archivos.';
+      if (ctx && typeof ctx.json === 'function') {
+        return ctx.json().then(function (j) { throw new Error((j && j.error) || base); }, function () { throw new Error(base); });
+      }
+      throw new Error(base);
+    });
+  }
+
+  // Video → Cloudflare Stream (subida reanudable: si se corta la conexión, retoma donde quedó). Devuelve el id del video.
+  function subirVideo(claseId, file, onProgress) {
+    if (!window.tus) return Promise.reject(new Error('No cargó el módulo de subida de videos. Recargá la página.'));
+    return llamar('video_subida', { clase_id: claseId, tamano: file.size }).then(function (r) {
+      return new Promise(function (resolve, reject) {
+        var up = new window.tus.Upload(file, {
+          uploadUrl: r.upload_url, uploadSize: file.size, chunkSize: 50 * 1024 * 1024,
+          retryDelays: [0, 3000, 5000, 10000, 20000],
+          metadata: { filename: file.name, filetype: file.type },
+          onError: function () { reject(new Error('Se cortó la subida del video. Probá de nuevo.')); },
+          onProgress: function (sent, total) { if (onProgress) onProgress(Math.round((sent / total) * 100)); },
+          onSuccess: function () { resolve(r.video_uid); }
+        });
+        up.start();
+      });
+    });
+  }
+
+  // PDF → Cloudflare R2 (enlace temporal de subida). Devuelve la ruta guardada.
+  function subirPdf(claseId, file, onProgress) {
+    return llamar('pdf_subida', { clase_id: claseId, tamano: file.size, tipo: file.type }).then(function (r) {
+      return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', r.upload_url);
+        xhr.setRequestHeader('Content-Type', 'application/pdf');
+        xhr.upload.onprogress = function (e) { if (onProgress && e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100)); };
+        xhr.onload = function () {
+          if (xhr.status >= 200 && xhr.status < 300) resolve(r.key);
+          else reject(new Error('No se pudo subir el PDF (error ' + xhr.status + ').'));
+        };
+        xhr.onerror = function () { reject(new Error('No se pudo subir el PDF. Si pasa siempre, falta permitir esta web (CORS) en el bucket de Cloudflare R2.')); };
+        xhr.send(file);
+      });
+    });
+  }
+
+  // Abre el video o el PDF de una clase en una pestaña nueva (enlace temporal; la base decide quién puede)
+  function verArchivo(claseId, tipo, onError) {
+    var w = window.open('', '_blank');
+    llamar('ver', { clase_id: claseId, tipo: tipo }).then(function (r) {
+      if (w) w.location.href = r.url; else window.location.href = r.url;
+    }).catch(function (e) { if (w) w.close(); if (onError) onError(e); });
+  }
+
+  // Borra de Cloudflare lo que ya no usa ninguna clase: { video_uids: [], archivos: [] }
+  function borrarRemoto(lo) {
+    if (!lo || (!(lo.video_uids || []).length && !(lo.archivos || []).length)) return Promise.resolve();
+    return llamar('borrar', lo).then(function () {}, function () {});
+  }
+
   function extension(file, porDefecto) {
     var e = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '');
     return e || porDefecto;
@@ -91,6 +155,7 @@
 
   window.ModoOnSubidas = {
     subir: subir, urlPublica: urlPublica, rutaDeUrlPublica: rutaDeUrlPublica, urlFirmada: urlFirmada,
-    abrirPrivado: abrirPrivado, borrar: borrar, duracionVideo: duracionVideo, extension: extension, azar: azar
+    abrirPrivado: abrirPrivado, borrar: borrar, duracionVideo: duracionVideo, extension: extension, azar: azar,
+    subirVideo: subirVideo, subirPdf: subirPdf, verArchivo: verArchivo, borrarRemoto: borrarRemoto
   };
 })();

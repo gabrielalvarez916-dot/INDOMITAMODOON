@@ -10,7 +10,7 @@
   var subiendo = 0; // cantidad de subidas en curso
   var temarioEl = null, checkEl = null;
 
-  var MAX_PORTADA_MB = 5, MAX_VIDEO_MB = 2048, MAX_PDF_MB = 100;
+  var MAX_PORTADA_MB = 5, MAX_VIDEO_MB = 10240, MAX_PDF_MB = 100;
   var TIPOS_PORTADA = ['image/jpeg', 'image/png', 'image/webp'];
   var TIPOS_VIDEO = ['video/mp4', 'video/webm', 'video/quicktime'];
   var TIPOS_PDF = ['application/pdf'];
@@ -60,7 +60,7 @@
       client.from('escalones_precio').select('precio_web_usd, precio_app_usd').eq('activo', true).order('precio_web_usd', { ascending: true }).then(check),
       cursoId
         ? client.from('cursos')
-            .select('id, titulo, subtitulo, descripcion, categoria_id, precio_usd, portada_url, estado, nota_revision, aprenderas, requisitos, modulos(id, titulo, orden, clases(id, titulo, descripcion, tipo, duracion_seg, orden, es_vista_previa, clases_contenido(video_path, archivo_path, descargable)))')
+            .select('id, titulo, subtitulo, descripcion, categoria_id, precio_usd, portada_url, estado, nota_revision, aprenderas, requisitos, modulos(id, titulo, orden, clases(id, titulo, descripcion, tipo, duracion_seg, orden, es_vista_previa, clases_contenido(video_uid, archivo_path, descargable)))')
             .eq('id', cursoId).eq('docente_id', uid).maybeSingle().then(check)
         : Promise.resolve(null)
     ]).then(function (r) {
@@ -248,7 +248,7 @@
       h('h3', { class: 'ed-modulo__titulo', text: (i + 1) + '. ' + m.titulo }),
       h('ul', { class: 'ed-lista' }, m.clases.map(function (cl) {
         var ct = cl.contenido || {};
-        return h('li', { text: cl.titulo + ' — ' + (ct.video_path ? 'video ✓' : 'sin video') + ' · ' + (ct.archivo_path ? 'PDF ✓' : 'sin PDF') + (cl.duracion_seg ? ' · ' + U.duracionClase(cl.duracion_seg) : '') });
+        return h('li', { text: cl.titulo + ' — ' + (ct.video_uid ? 'video ✓' : 'sin video') + ' · ' + (ct.archivo_path ? 'PDF ✓' : 'sin PDF') + (cl.duracion_seg ? ' · ' + U.duracionClase(cl.duracion_seg) : '') });
       })));
   }
 
@@ -276,7 +276,11 @@
 
   function rutasDeClase(cl) {
     var ct = cl.contenido || {};
-    return [ct.video_path, ct.archivo_path].filter(Boolean);
+    return { video_uids: ct.video_uid ? [ct.video_uid] : [], archivos: ct.archivo_path ? [ct.archivo_path] : [] };
+  }
+  function sumarRutas(acum, r) {
+    acum.video_uids = acum.video_uids.concat(r.video_uids); acum.archivos = acum.archivos.concat(r.archivos);
+    return acum;
   }
 
   function tarjetaModulo(m, i, lista) {
@@ -300,10 +304,10 @@
         boton('Borrar', 'ed-btn--mal ed-btn--chico', function () {
           if (!libre()) return;
           if (!window.confirm('¿Borrar el módulo "' + m.titulo + '" con sus ' + m.clases.length + ' clases y sus archivos? No se puede deshacer.')) return;
-          var rutas = []; m.clases.forEach(function (cl) { rutas = rutas.concat(rutasDeClase(cl)); });
+          var rutas = { video_uids: [], archivos: [] }; m.clases.forEach(function (cl) { sumarRutas(rutas, rutasDeClase(cl)); });
           client.from('modulos').delete().eq('id', m.id).select('id').then(check).then(function (d) {
             if (!d || !d.length) throw new Error('la base no permitió borrarlo');
-            S.borrar('clases', rutas);
+            S.borrarRemoto(rutas);
             datos.curso.modulos = datos.curso.modulos.filter(function (x) { return x.id !== m.id; });
             pintarTemario();
           }).catch(fail);
@@ -349,7 +353,7 @@
             var rutas = rutasDeClase(cl);
             client.from('clases').delete().eq('id', cl.id).select('id').then(check).then(function (d) {
               if (!d || !d.length) throw new Error('la base no permitió borrarla');
-              S.borrar('clases', rutas);
+              S.borrarRemoto(rutas);
               m.clases = m.clases.filter(function (x) { return x.id !== cl.id; });
               pintarTemario();
             }).catch(fail);
@@ -372,15 +376,14 @@
   // Un casillero para subir un archivo de la clase (video o PDF)
   function slotArchivo(o) {
     var cl = o.cl;
-    var col = o.tipo === 'video' ? 'video_path' : 'archivo_path';
+    var col = o.tipo === 'video' ? 'video_uid' : 'archivo_path';
     var estadoEl = h('p', { class: 'ed-slot__estado' });
     var barra = h('div', { class: 'ed-barra', hidden: true, role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100' }, h('span'));
     var textoSel = h('span');
     var input = h('input', { type: 'file', accept: o.accept, hidden: true, 'aria-label': o.etiqueta + ' de la clase' });
     var selector = h('label', { class: 'ed-btn ed-subir' }, textoSel, input);
     var ver = boton('Ver', 'ed-btn--suave ed-btn--chico', function () {
-      var p = (cl.contenido || {})[col];
-      if (p) S.abrirPrivado('clases', p, fail);
+      if ((cl.contenido || {})[col]) S.verArchivo(cl.id, o.tipo, fail);
     });
     var chkDesc = null;
     if (o.conDescargable) {
@@ -425,30 +428,33 @@
       estadoEl, barra,
       h('div', { class: 'ed-fila' }, selector, ver),
       filaDesc,
-      h('small', { text: o.tipo === 'video' ? 'MP4, WebM o MOV · hasta ' + mb(o.maxMb) + '.' : 'PDF · hasta ' + mb(o.maxMb) + '.' }));
+      h('small', { text: o.tipo === 'video' ? 'MP4, WebM o MOV · hasta ' + mb(o.maxMb) + '. Se puede retomar si se corta.' : 'PDF · hasta ' + mb(o.maxMb) + '.' }));
   }
 
   function subirArchivoClase(cl, tipo, col, file, ui) {
     var viejo = (cl.contenido || {})[col];
-    var path = uid + '/' + cursoId + '/' + cl.id + '-' + tipo + '-' + S.azar() + '.' + S.extension(file, tipo === 'video' ? 'mp4' : 'pdf');
-    var set = {}; set[col] = path;
-    var segundos = 0;
+    var segundos = 0, nuevo = null;
+    function como(ref) { return tipo === 'video' ? { video_uids: [ref], archivos: [] } : { video_uids: [], archivos: [ref] }; }
     subiendo++; ui.empezar();
     var dur = tipo === 'video' ? S.duracionVideo(file) : Promise.resolve(0);
-    S.subir('clases', path, file, ui.progreso).then(function () {
+    // Video → Cloudflare Stream · PDF → Cloudflare R2
+    var subida = tipo === 'video' ? S.subirVideo(cl.id, file, ui.progreso) : S.subirPdf(cl.id, file, ui.progreso);
+    subida.then(function (ref) {
+      nuevo = ref;
+      var set = {}; set[col] = ref;
       var op = cl.contenido
         ? client.from('clases_contenido').update(set).eq('clase_id', cl.id).select('clase_id')
         : client.from('clases_contenido').insert(Object.assign({ clase_id: cl.id, descargable: true }, set)).select('clase_id');
       return op.then(check).then(function (d) {
         if (!d || !d.length) throw new Error('la base no permitió guardar el archivo');
-      }).catch(function (e) { S.borrar('clases', [path]); throw e; });
+        cl.contenido = Object.assign(cl.contenido || { descargable: true }, set);
+      }).catch(function (e) { S.borrarRemoto(como(ref)); throw e; });
     }).then(function () { return dur; }).then(function (seg) {
       segundos = seg;
       if (seg) return client.from('clases').update({ duracion_seg: seg }).eq('id', cl.id).select('id').then(check);
     }).then(function () {
-      cl.contenido = Object.assign(cl.contenido || { descargable: true }, set);
       if (segundos) cl.duracion_seg = segundos;
-      if (viejo) S.borrar('clases', [viejo]);
+      if (viejo) S.borrarRemoto(como(viejo));
       U.toast(tipo === 'video' ? 'Video subido' : 'PDF subido');
     }).catch(fail).then(function () { subiendo--; ui.terminar(); pintarChecklist(); });
   }
@@ -464,7 +470,7 @@
     mods.forEach(function (m) { clases = clases.concat(m.clases); });
     p.push([mods.length > 0, 'Al menos un módulo']);
     p.push([mods.length > 0 && mods.every(function (m) { return m.clases.length > 0; }), 'Todos los módulos tienen clases']);
-    var sinVideo = clases.filter(function (x) { return !(x.contenido && x.contenido.video_path); }).length;
+    var sinVideo = clases.filter(function (x) { return !(x.contenido && x.contenido.video_uid); }).length;
     var sinPdf = clases.filter(function (x) { return !(x.contenido && x.contenido.archivo_path); }).length;
     p.push([clases.length > 0 && sinVideo === 0, clases.length ? (sinVideo ? sinVideo + (sinVideo === 1 ? ' clase sin video' : ' clases sin video') : 'Todas las clases tienen video') : 'Al menos una clase con video']);
     p.push([clases.length > 0 && sinPdf === 0, clases.length ? (sinPdf ? sinPdf + (sinPdf === 1 ? ' clase sin PDF' : ' clases sin PDF') : 'Todas las clases tienen PDF') : 'Al menos una clase con PDF']);
@@ -496,12 +502,12 @@
     var borrarBtn = boton('Borrar este borrador', 'ed-btn--mal ed-btn--chico', function () {
       if (!libre()) return;
       if (!window.confirm('¿Borrar el curso "' + datos.curso.titulo + '" con todo su contenido? No se puede deshacer.')) return;
-      var rutas = [];
-      datos.curso.modulos.forEach(function (m) { m.clases.forEach(function (cl) { rutas = rutas.concat(rutasDeClase(cl)); }); });
+      var rutas = { video_uids: [], archivos: [] };
+      datos.curso.modulos.forEach(function (m) { m.clases.forEach(function (cl) { sumarRutas(rutas, rutasDeClase(cl)); }); });
       var portada = S.rutaDeUrlPublica('portadas', datos.curso.portada_url);
       client.from('cursos').delete().eq('id', cursoId).select('id').then(check).then(function (d) {
         if (!d || !d.length) throw new Error('la base no permitió borrarlo');
-        S.borrar('clases', rutas); if (portada) S.borrar('portadas', [portada]);
+        S.borrarRemoto(rutas); if (portada) S.borrar('portadas', [portada]);
         window.location.replace('ser-docente.html');
       }).catch(fail);
     });
