@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Prototipo · Actividad de peces</title>
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--black:#111;--cream:#F8F5EC;--lime:#C8F000;--yellow:#FFD400}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:var(--black)}
+
+/* ---------- Logo (intro) ---------- */
+.intro{position:fixed;inset:0;z-index:50;background:var(--black);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .8s ease,visibility .8s}
+.intro.off{opacity:0;visibility:hidden}
+.logo-badge{width:120px;height:120px;border-radius:50%;background:var(--lime);display:grid;place-items:center;box-shadow:0 0 40px rgba(200,240,0,.45);animation:pop .9s cubic-bezier(.2,1.4,.4,1) both}
+.logo-badge svg{width:78px;height:auto;color:var(--black)}
+.logo-name{margin:0;color:var(--cream);font-weight:800;font-size:clamp(2rem,8vw,3.2rem);letter-spacing:-.02em;animation:rise .8s .35s both}
+.logo-name span{color:var(--lime)}
+.logo-tag{margin:0;color:var(--cream);opacity:.8;font-size:.72rem;letter-spacing:.35em;text-transform:uppercase;animation:rise .8s .6s both}
+@keyframes pop{from{transform:scale(.3) rotate(-20deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes rise{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+
+/* ---------- Escena ---------- */
+.app{position:fixed;inset:0;display:flex;flex-direction:column}
+.water{position:relative;flex:1;min-height:0;overflow:hidden;
+  background:linear-gradient(180deg,#7fe0ee 0%,#2fb4d6 38%,#1478b5 75%,#0c4f8a 100%)}
+.water::before{content:"";position:absolute;inset:-20% -10% auto -10%;height:90%;
+  background:repeating-linear-gradient(105deg,rgba(255,255,255,.14) 0 40px,transparent 40px 110px);
+  transform-origin:top;animation:rays 9s ease-in-out infinite alternate;pointer-events:none}
+@keyframes rays{from{transform:skewX(-6deg);opacity:.55}to{transform:skewX(6deg);opacity:1}}
+.waves{position:absolute;top:0;left:0;width:200%;height:46px;pointer-events:none;animation:slide 12s linear infinite}
+@keyframes slide{to{transform:translateX(-50%)}}
+.bubble{position:absolute;bottom:-30px;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(255,255,255,.12);animation:up linear infinite;pointer-events:none}
+@keyframes up{to{transform:translateY(-110vh)}}
+.sand{position:absolute;left:0;right:0;bottom:0;height:34px;background:#f0d9a0;border-radius:50% 50% 0 0/100% 100% 0 0;opacity:.9;pointer-events:none}
+
+/* ---------- Peces ---------- */
+.fish{position:absolute;width:clamp(78px,15vw,120px);aspect-ratio:3/2;padding:0;border:0;background:none;cursor:pointer;
+  transform:translate(-50%,-50%);transition:opacity .5s ease,left 1s ease-in;touch-action:manipulation}
+.fish .bob{position:absolute;inset:0;animation:bob var(--d,4s) ease-in-out infinite alternate;animation-delay:var(--dl,0s)}
+.fish .flip{position:absolute;inset:0;transform:scaleX(var(--f,1))}
+.fish svg{width:100%;height:100%;display:block;filter:drop-shadow(0 6px 6px rgba(0,40,80,.35))}
+.fish::after{content:"";position:absolute;inset:-8px -6px;border-radius:50%;border:5px solid transparent;transition:all .18s ease;pointer-events:none}
+.fish.sel::after{border-color:var(--yellow);box-shadow:0 0 16px 4px rgba(255,212,0,.75),inset 0 0 12px rgba(255,212,0,.5)}
+.fish:active .bob{transform:scale(.94)}
+.fish.in{animation:fishin .7s both}
+.fish.out{opacity:0}
+@keyframes bob{from{transform:translate(-8px,-6px) rotate(-2deg)}to{transform:translate(8px,7px) rotate(2deg)}}
+@keyframes fishin{from{opacity:0;margin-top:30px}to{opacity:1;margin-top:0}}
+
+/* ---------- Panel inferior ---------- */
+.panel{background:var(--cream);padding:16px 18px calc(18px + env(safe-area-inset-bottom,0px));text-align:center;
+  border-top:4px solid var(--black);display:flex;flex-direction:column;align-items:center;gap:12px;min-height:128px;justify-content:center}
+.consigna{margin:0;font-weight:800;font-size:clamp(1.1rem,4.4vw,1.7rem);display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.consigna .mini{width:52px;height:34px;color:#FF7A59}
+.btn{font:800 1.05rem Montserrat,sans-serif;border:3px solid var(--black);border-radius:999px;padding:12px 34px;background:var(--lime);color:var(--black);cursor:pointer;
+  box-shadow:0 4px 0 var(--black);transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--black)}
+.btn[hidden]{display:none}
+.nums{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.num{font:800 1.7rem Montserrat,sans-serif;width:72px;height:72px;border-radius:20px;border:3px solid var(--black);background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--black);transition:transform .1s,background .15s}
+.num:active{transform:translateY(3px);box-shadow:0 1px 0 var(--black)}
+.num.sel{background:var(--yellow)}
+.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.toast{position:absolute;left:50%;top:64px;transform:translate(-50%,-20px);background:var(--black);color:var(--cream);font-weight:600;padding:10px 20px;border-radius:999px;opacity:0;transition:all .3s;z-index:20;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Papel picado + confeti ---------- */
+.picado{position:fixed;left:0;right:0;top:0;z-index:40;pointer-events:none;transform:translateY(-120%);transition:transform .6s cubic-bezier(.2,1.2,.4,1)}
+.picado.on{transform:none}
+.picado .cuerda{height:4px;background:#f3e9c8;margin:10px 0 0}
+.picado .flags{display:flex;justify-content:space-around;margin-top:-4px}
+.flag{width:11vw;max-width:96px;height:clamp(70px,13vw,110px);background:var(--c);transform-origin:top center;animation:sway 1.6s ease-in-out infinite alternate;animation-delay:var(--dl);
+  clip-path:polygon(0 0,100% 0,100% 82%,87% 100%,74% 82%,62% 100%,50% 82%,38% 100%,26% 82%,13% 100%,0 82%);
+  -webkit-mask-image:radial-gradient(circle at center,transparent 0 3px,#000 3.6px);mask-image:radial-gradient(circle at center,transparent 0 3px,#000 3.6px);
+  -webkit-mask-size:13px 13px;mask-size:13px 13px}
+@keyframes sway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+#confeti{position:fixed;inset:0;z-index:41;pointer-events:none;width:100%;height:100%}
+
+/* ---------- Final ---------- */
+.fin{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:10;text-align:center;color:#fff}
+.fin.on{display:flex}
+.fin h2{margin:0;font-size:clamp(2rem,8vw,3.4rem);font-weight:800;text-shadow:0 4px 0 rgba(0,0,0,.25)}
+.fin p{margin:0;font-weight:600;font-size:1.1rem}
+.fin svg{width:110px;color:var(--lime)}
+.reset{position:absolute;right:10px;top:10px;z-index:30;font:600 .7rem Montserrat,sans-serif;background:rgba(17,17,17,.55);color:#fff;border:0;border-radius:999px;padding:6px 12px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- Pez reutilizable -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="pez" viewBox="0 0 120 80">
+      <path d="M88 40 L118 12 Q109 40 118 68 Z" fill="currentColor"/>
+      <path d="M38 14 Q54 -4 72 16 Q55 24 38 14Z" fill="currentColor" opacity=".8"/>
+      <path d="M44 66 Q56 80 70 66 Q56 62 44 66Z" fill="currentColor" opacity=".8"/>
+      <ellipse cx="52" cy="40" rx="45" ry="28" fill="currentColor"/>
+      <ellipse cx="50" cy="52" rx="32" ry="12" fill="#fff" opacity=".25"/>
+      <path d="M64 16 Q72 40 64 64" stroke="#fff" stroke-width="5" fill="none" opacity=".35" stroke-linecap="round"/>
+      <path d="M78 22 Q85 40 78 58" stroke="#fff" stroke-width="5" fill="none" opacity=".35" stroke-linecap="round"/>
+      <circle cx="24" cy="34" r="7.5" fill="#fff"/><circle cx="22.5" cy="34" r="3.8" fill="#111"/>
+      <path d="M10 46 Q15 49 19 46" stroke="#111" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- Logo -->
+<div class="intro" id="intro">
+  <div class="logo-badge"><svg viewBox="0 0 120 80"><use href="#pez"/></svg></div>
+  <h1 class="logo-name">Mar de <span>Saberes</span></h1>
+  <p class="logo-tag">Aprender jugando</p>
+</div>
+
+<div class="app">
+  <div class="water" id="agua">
+    <svg class="waves" viewBox="0 0 1200 46" preserveAspectRatio="none" aria-hidden="true"><path d="M0 22 Q75 0 150 22 T300 22 T450 22 T600 22 T750 22 T900 22 T1050 22 T1200 22 V0 H0Z" fill="rgba(255,255,255,.55)"/></svg>
+    <div class="sand"></div>
+    <button class="reset" id="reset" type="button">↺ Reiniciar</button>
+    <div class="toast" id="toast"></div>
+    <div class="fin" id="fin">
+      <svg viewBox="0 0 120 80"><use href="#pez"/></svg>
+      <h2>¡Terminaste!</h2>
+      <p>Contaste todos los peces 🎉</p>
+      <button class="btn" id="otra" type="button">Jugar otra vez</button>
+    </div>
+  </div>
+  <div class="panel" id="panel"></div>
+</div>
+
+<div class="picado" id="picado" aria-hidden="true"><div class="cuerda"></div><div class="flags" id="flags"></div></div>
+<canvas id="confeti"></canvas>
+
+<script>
+(function(){
+  var COLORES=['#FF7A59','#F25C9B','#8E7DFF','#2EC4B6','#FF8C42','#7BD389','#EF476F','#B388EB','#5EC8F2','#F4845F','#4D96FF'];
+  var agua=document.getElementById('agua'), panel=document.getElementById('panel');
+  var toast=document.getElementById('toast'), fin=document.getElementById('fin');
+  var bloqueado=false, peces=[], elegidos=new Set(), etapa=0;
+
+  /* burbujas */
+  for(var i=0;i<14;i++){var b=document.createElement('i');b.className='bubble';var s=6+Math.random()*16;
+    b.style.cssText='left:'+Math.random()*100+'%;width:'+s+'px;height:'+s+'px;animation-duration:'+(8+Math.random()*10)+'s;animation-delay:-'+Math.random()*14+'s';agua.appendChild(b);}
+
+  function aviso(t){toast.textContent=t;toast.classList.add('show');clearTimeout(aviso.t);aviso.t=setTimeout(function(){toast.classList.remove('show')},1600);}
+  function sacudir(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+
+  /* ---------- peces ---------- */
+  function crearPeces(n){
+    var cols=n<=8?4:4, rows=Math.ceil(n/cols), celdas=[];
+    for(var r=0;r<rows;r++)for(var c=0;c<cols;c++)celdas.push([c,r]);
+    celdas.sort(function(){return Math.random()-.5}).splice(n);
+    var col=COLORES.slice().sort(function(){return Math.random()-.5});
+    celdas.forEach(function(ce,i){
+      var b=document.createElement('button');b.className='fish in';b.type='button';b.setAttribute('aria-label','pez');
+      var x=(ce[0]+.5)/cols*84+8+(Math.random()-.5)*7, y=(ce[1]+.5)/rows*66+14+(Math.random()-.5)*6;
+      b.style.left=x+'%';b.style.top=y+'%';
+      b.style.setProperty('--d',(3+Math.random()*3)+'s');b.style.setProperty('--dl','-'+Math.random()*4+'s');
+      b.style.setProperty('--f',Math.random()<.5?1:-1);
+      b.style.color=col[i%col.length];
+      b.innerHTML='<span class="bob"><span class="flip"><svg viewBox="0 0 120 80"><use href="#pez"/></svg></span></span>';
+      b.dataset.i=i;
+      b.addEventListener('click',function(){alClickPez(b)});
+      agua.appendChild(b);peces.push(b);
+    });
+  }
+  function quitarPeces(){
+    return new Promise(function(res){
+      peces.forEach(function(p,i){p.classList.remove('in');p.style.left=(i%2?125:-25)+'%';p.classList.add('out');});
+      setTimeout(function(){peces.forEach(function(p){p.remove()});peces=[];elegidos.clear();res();},1000);
+    });
+  }
+  function alClickPez(b){
+    if(bloqueado||etapa!==1)return;
+    if(elegidos.has(b)){elegidos.delete(b);b.classList.remove('sel');}
+    else{elegidos.add(b);b.classList.add('sel');}
+    document.getElementById('listo').hidden=elegidos.size===0;
+  }
+
+  /* ---------- etapas ---------- */
+  function etapa1(){
+    etapa=1;crearPeces(8);
+    panel.innerHTML='<p class="consigna">Hacé click en 5 peces <svg class="mini" viewBox="0 0 120 80"><use href="#pez"/></svg></p><button class="btn" id="listo" type="button" hidden>¡Listo!</button>';
+    document.getElementById('listo').addEventListener('click',function(){
+      if(bloqueado)return;
+      if(elegidos.size===5){bloqueado=true;celebrar().then(function(){return quitarPeces()}).then(function(){etapa2();bloqueado=false;});}
+      else{sacudir(this);aviso('Casi… probá de nuevo 🙂');}
+    });
+  }
+  function etapa2(){
+    etapa=2;crearPeces(11);
+    panel.innerHTML='<p class="consigna">¿Cuántos peces ves?</p><div class="nums" id="nums"></div>';
+    var cont=document.getElementById('nums');
+    [9,10,11,12].forEach(function(n){
+      var b=document.createElement('button');b.className='num';b.type='button';b.textContent=n;
+      b.addEventListener('click',function(){
+        if(bloqueado)return;
+        cont.querySelectorAll('.num').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
+        if(n===11){bloqueado=true;celebrar().then(function(){return quitarPeces()}).then(function(){final();bloqueado=false;});}
+        else{sacudir(b);aviso('Probá de nuevo 🙂');setTimeout(function(){b.classList.remove('sel')},500);}
+      });
+      cont.appendChild(b);
+    });
+  }
+  function final(){etapa=3;panel.innerHTML='<p class="consigna">¡Muy bien! 👏</p>';fin.classList.add('on');}
+  function reiniciar(){
+    bloqueado=false;fin.classList.remove('on');
+    peces.forEach(function(p){p.remove()});peces=[];elegidos.clear();etapa1();
+  }
+  document.getElementById('reset').addEventListener('click',reiniciar);
+  document.getElementById('otra').addEventListener('click',reiniciar);
+
+  /* ---------- papel picado + confeti ---------- */
+  var flagsEl=document.getElementById('flags'),picado=document.getElementById('picado');
+  ['#FF4D8D','#FFD400','#2EC4B6','#8E7DFF','#FF8C42','#C8F000','#4D96FF','#FF4D8D','#FFD400'].forEach(function(c,i){
+    var f=document.createElement('div');f.className='flag';f.style.setProperty('--c',c);f.style.setProperty('--dl',(i%3)*-.4+'s');flagsEl.appendChild(f);});
+  var cv=document.getElementById('confeti'),cx=cv.getContext('2d'),parts=[],raf;
+  function tam(){cv.width=innerWidth;cv.height=innerHeight}tam();addEventListener('resize',tam);
+  function celebrar(){
+    return new Promise(function(res){
+      picado.classList.add('on');
+      var cols=['#FF4D8D','#FFD400','#2EC4B6','#8E7DFF','#FF8C42','#C8F000','#4D96FF'];
+      for(var i=0;i<140;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,w:8+Math.random()*8,h:12+Math.random()*10,
+        vy:2+Math.random()*3.5,vx:(Math.random()-.5)*2.2,r:Math.random()*6,vr:(Math.random()-.5)*.25,c:cols[i%cols.length]});
+      cancelAnimationFrame(raf);(function loop(){
+        cx.clearRect(0,0,cv.width,cv.height);
+        parts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore();});
+        parts=parts.filter(function(p){return p.y<cv.height+30});
+        if(parts.length)raf=requestAnimationFrame(loop);else cx.clearRect(0,0,cv.width,cv.height);
+      })();
+      setTimeout(function(){picado.classList.remove('on')},2000);
+      setTimeout(res,2300);
+    });
+  }
+
+  /* ---------- arranque ---------- */
+  setTimeout(function(){document.getElementById('intro').classList.add('off');etapa1();},2600);
+})();
+</script>
+</body>
+</html>
