@@ -67,6 +67,9 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
 .num{font:800 1.7rem Montserrat,sans-serif;width:72px;height:72px;border-radius:20px;border:3px solid var(--black);background:#fff;cursor:pointer;box-shadow:0 4px 0 var(--black);transition:transform .1s,background .15s}
 .num:active{transform:translateY(3px);box-shadow:0 1px 0 var(--black)}
 .num.sel{background:var(--yellow)}
+.vozbtn{font-size:1.3rem;width:46px;height:46px;border-radius:50%;border:3px solid var(--black);background:#fff;cursor:pointer;box-shadow:0 3px 0 var(--black);line-height:1;padding:0}
+.vozbtn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--black)}
+.start{margin-top:14px;animation:rise .8s .9s both}
 .shake{animation:shake .45s}
 @keyframes shake{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
 .toast{position:absolute;left:50%;top:64px;transform:translate(-50%,-20px);background:var(--black);color:var(--cream);font-weight:600;padding:10px 20px;border-radius:999px;opacity:0;transition:all .3s;z-index:20;pointer-events:none;white-space:nowrap}
@@ -117,6 +120,7 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
   <div class="logo-badge"><svg viewBox="0 0 120 80"><use href="#pez"/></svg></div>
   <h1 class="logo-name">Mar de <span>Saberes</span></h1>
   <p class="logo-tag">Aprender jugando</p>
+  <button class="btn start" id="start" type="button">▶ Tocá para empezar</button>
 </div>
 
 <div class="app">
@@ -148,6 +152,30 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
   /* burbujas */
   for(var i=0;i<14;i++){var b=document.createElement('i');b.className='bubble';var s=6+Math.random()*16;
     b.style.cssText='left:'+Math.random()*100+'%;width:'+s+'px;height:'+s+'px;animation-duration:'+(8+Math.random()*10)+'s;animation-delay:-'+Math.random()*14+'s';agua.appendChild(b);}
+
+  /* ---------- voz sintética ---------- */
+  var voz=null;
+  function elegirVoz(){
+    var vs=(window.speechSynthesis&&speechSynthesis.getVoices())||[];
+    var es=vs.filter(function(v){return /^es/i.test(v.lang)});
+    function pref(re){return es.filter(function(v){return re.test(v.lang)})}
+    var orden=[pref(/AR/i),pref(/US|MX|419/i),es];
+    for(var i=0;i<orden.length;i++){
+      var l=orden[i];if(!l.length)continue;
+      var buena=l.filter(function(v){return /natural|google|online|premium|paulina|monica|sabina/i.test(v.name)})[0];
+      voz=buena||l[0];return;
+    }
+  }
+  if('speechSynthesis' in window){elegirVoz();speechSynthesis.onvoiceschanged=elegirVoz;}
+  function hablar(t){
+    if(!('speechSynthesis' in window))return;
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(t);
+    u.lang=voz?voz.lang:'es-AR';if(voz)u.voice=voz;
+    u.rate=.88;u.pitch=1.1;
+    speechSynthesis.speak(u);
+  }
+  var CONSIGNA1='Hacé clic en cinco peces', CONSIGNA2='¿Cuántos peces ves?';
 
   function aviso(t){toast.textContent=t;toast.classList.add('show');clearTimeout(aviso.t);aviso.t=setTimeout(function(){toast.classList.remove('show')},1600);}
   function sacudir(el){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
@@ -187,16 +215,20 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
   /* ---------- etapas ---------- */
   function etapa1(){
     etapa=1;crearPeces(8);
-    panel.innerHTML='<p class="consigna">Hacé click en 5 peces <svg class="mini" viewBox="0 0 120 80"><use href="#pez"/></svg></p><button class="btn" id="listo" type="button" hidden>¡Listo!</button>';
+    panel.innerHTML='<p class="consigna"><button class="vozbtn" id="voz" type="button" aria-label="Escuchar">🔊</button>Hacé click en 5 peces <svg class="mini" viewBox="0 0 120 80"><use href="#pez"/></svg></p><button class="btn" id="listo" type="button" hidden>¡Listo!</button>';
+    document.getElementById('voz').addEventListener('click',function(){hablar(CONSIGNA1)});
+    hablar(CONSIGNA1);
     document.getElementById('listo').addEventListener('click',function(){
       if(bloqueado)return;
       if(elegidos.size===5){bloqueado=true;celebrar().then(function(){return quitarPeces()}).then(function(){etapa2();bloqueado=false;});}
-      else{sacudir(this);aviso('Casi… probá de nuevo 🙂');}
+      else{sacudir(this);aviso('Casi… probá de nuevo 🙂');hablar('Casi, probá de nuevo');}
     });
   }
   function etapa2(){
     etapa=2;crearPeces(11);
-    panel.innerHTML='<p class="consigna">¿Cuántos peces ves?</p><div class="nums" id="nums"></div>';
+    panel.innerHTML='<p class="consigna"><button class="vozbtn" id="voz" type="button" aria-label="Escuchar">🔊</button>¿Cuántos peces ves?</p><div class="nums" id="nums"></div>';
+    document.getElementById('voz').addEventListener('click',function(){hablar(CONSIGNA2)});
+    hablar(CONSIGNA2);
     var cont=document.getElementById('nums');
     [9,10,11,12].forEach(function(n){
       var b=document.createElement('button');b.className='num';b.type='button';b.textContent=n;
@@ -204,12 +236,12 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
         if(bloqueado)return;
         cont.querySelectorAll('.num').forEach(function(x){x.classList.remove('sel')});b.classList.add('sel');
         if(n===11){bloqueado=true;celebrar().then(function(){return quitarPeces()}).then(function(){final();bloqueado=false;});}
-        else{sacudir(b);aviso('Probá de nuevo 🙂');setTimeout(function(){b.classList.remove('sel')},500);}
+        else{sacudir(b);aviso('Probá de nuevo 🙂');hablar('Probá de nuevo');setTimeout(function(){b.classList.remove('sel')},500);}
       });
       cont.appendChild(b);
     });
   }
-  function final(){etapa=3;panel.innerHTML='<p class="consigna">¡Muy bien! 👏</p>';fin.classList.add('on');}
+  function final(){etapa=3;hablar('¡Terminaste! Contaste todos los peces');panel.innerHTML='<p class="consigna">¡Muy bien! 👏</p>';fin.classList.add('on');}
   function reiniciar(){
     bloqueado=false;fin.classList.remove('on');
     peces.forEach(function(p){p.remove()});peces=[];elegidos.clear();etapa1();
@@ -225,7 +257,7 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
   function tam(){cv.width=innerWidth;cv.height=innerHeight}tam();addEventListener('resize',tam);
   function celebrar(){
     return new Promise(function(res){
-      picado.classList.add('on');
+      picado.classList.add('on');hablar('¡Muy bien!');
       var cols=['#FF4D8D','#FFD400','#2EC4B6','#8E7DFF','#FF8C42','#C8F000','#4D96FF'];
       for(var i=0;i<140;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,w:8+Math.random()*8,h:12+Math.random()*10,
         vy:2+Math.random()*3.5,vx:(Math.random()-.5)*2.2,r:Math.random()*6,vr:(Math.random()-.5)*.25,c:cols[i%cols.length]});
@@ -241,7 +273,7 @@ body{font-family:Montserrat,system-ui,sans-serif;background:var(--black);color:v
   }
 
   /* ---------- arranque ---------- */
-  setTimeout(function(){document.getElementById('intro').classList.add('off');etapa1();},2600);
+  document.getElementById('start').addEventListener('click',function(){document.getElementById('intro').classList.add('off');etapa1();});
 })();
 </script>
 </body>
